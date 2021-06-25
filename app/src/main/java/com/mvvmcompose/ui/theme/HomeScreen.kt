@@ -1,5 +1,6 @@
 package com.mvvmcompose.ui.theme
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -25,22 +26,33 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import coil.ImageLoader
+import coil.request.ImageRequest
+//import com.google.accompanist.coil.CoilImage
 import com.mvvmcompose.R
+import com.mvvmcompose.data.models.PokedexListEntry
+import com.mvvmcompose.pokemonlist.PokemonListViewModel
+import com.skydoves.landscapist.coil.CoilImage
+import kotlinx.coroutines.NonDisposableHandle.parent
 
 
 @ExperimentalFoundationApi
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: PokemonListViewModel) {
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
@@ -61,9 +73,7 @@ fun HomeScreen() {
                     .padding(5.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            PokemonList(
-                features = FeatureData.load()
-            )
+            PokemonList(viewModel)
         }
     }
 }
@@ -113,23 +123,33 @@ fun SearchBar(
 
 @ExperimentalFoundationApi
 @Composable
-fun PokemonList(features: List<Feature>) {
+fun PokemonList(viewModel: PokemonListViewModel) {
+
+    val pokemonList by remember { viewModel.pokemonList }
+    val endReached by remember { viewModel.endReached }
+    val loadError by remember { viewModel.loadError }
+    val isLoading by remember { viewModel.isLoading }
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
         contentPadding = PaddingValues(start = 7.5.dp, bottom = 100.dp),
         modifier = Modifier.fillMaxHeight()
     ) {
-        items(features.size) {
-            PokemonItem(entry = features[it])
+        items(pokemonList.size) {
+            PokemonItem(
+                entry = pokemonList[it],
+                modifier = Modifier.padding(12.dp),
+                viewModel = viewModel
+            )
         }
     }
 }
 
 @Composable
 fun PokemonItem(
-    entry: Feature,
+    entry: PokedexListEntry,
     modifier: Modifier = Modifier,
+    viewModel: PokemonListViewModel,
 ) {
     val defaultDominantColor = MaterialTheme.colors.surface
     var dominantColor by remember {
@@ -158,61 +178,55 @@ fun PokemonItem(
 
     ){
         Column {
-//            CoilImage(
-//                request = ImageRequest.Builder(LocalContext.current)
-//                    .data(entry.imageUrl)
-//                    .target{
-//                        viewModel.calcDominantColor(it){ color ->
-//                            dominantColor = color
-//                        }
-//                    }
+            CoilImage(
+                imageRequest = ImageRequest.Builder(LocalContext.current)
+                    .data(entry.imageUrl)
+                    .target{
+                        viewModel.calcDominantColor(it){ color ->
+                            dominantColor = color
+                        }
+                    }
+                    .crossfade(true)
+                    .build(),
+
+                //enable this for devices with low memory, so images will not be caached to devices, only when they are visible
+//                imageLoader = ImageLoader.Builder(LocalContext.current)
+//                    .availableMemoryPercentage(0.25)
+//                    .crossfade(true)
 //                    .build(),
-//                contentDescription = entry.pokemonName,
-//                fadeIn = true,
-//                modifier = Modifier
-//                    .size(120.dp)
-//                    .align(CenterHorizontally)
-//            ) {
-//                CircularProgressIndicator(
-//                    color = MaterialTheme.colors.primary,
-//                    //modifier = Modifier.scale(0.5f)
-//                )
-//            }
+
+                modifier = Modifier
+                    .size(120.dp)
+                    .align(CenterHorizontally),
+                // shows a progress indicator when loading an image.
+                loading = {
+                    ConstraintLayout(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val indicator = createRef()
+                        CircularProgressIndicator(
+                            modifier = Modifier.constrainAs(indicator) {
+                                top.linkTo(parent.top)
+                                bottom.linkTo(parent.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            }
+                        )
+                    }
+                },
+                // shows an error text message when request failed.
+                failure = {
+                    Text(text = "image request failed.")
+                })
+
+
             Text(
-                text = entry.title,
+                text = entry.pokemonName,
                 fontFamily = RobotoCondensed,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-    }
-}
-
-data class Feature(
-    val title: String,
-    @DrawableRes val iconId: Int,
-)
-
-object FeatureData{
-    fun load(): List<Feature>{
-        return listOf(
-            Feature(
-                title = "Bulbbasaur",
-                R.drawable.ic_profile,
-            ),
-            Feature(
-                title = "Ivysaur",
-                R.drawable.ic_home,
-            ),
-            Feature(
-                title = "Venasaur",
-                R.drawable.ic_headphone,
-            ),
-            Feature(
-                title = "Charmander",
-                R.drawable.ic_music,
-            )
-        )
     }
 }
