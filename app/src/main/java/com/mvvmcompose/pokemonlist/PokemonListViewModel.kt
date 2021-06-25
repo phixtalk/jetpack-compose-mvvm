@@ -38,7 +38,7 @@ class PokemonListViewModel (
             val result = repository.getPokenList(PAGE_SIZE, curPage * PAGE_SIZE)
             when(result){
                 is Resource.Success -> {
-                    endReached.value = curPage * PAGE_SIZE >= result.data!!.count
+                    endReached.value = curPage * PAGE_SIZE >= result.data!!.count//to check if there is more entries on the server
                     var pokedexEntries = result.data.results.mapIndexed { index, entry ->
                         var number = if (entry.url.endsWith("/")){
                             entry.url.dropLast(1).takeLastWhile { it.isDigit() }

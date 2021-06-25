@@ -133,15 +133,39 @@ fun PokemonList(viewModel: PokemonListViewModel) {
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
         contentPadding = PaddingValues(start = 7.5.dp, bottom = 100.dp),
-        modifier = Modifier.fillMaxHeight()
+//        modifier = Modifier.fillMaxHeight()
     ) {
+        var itemCount = if (pokemonList.size % 2 == 0){//since we are using a grid, to get the current item position
+            pokemonList.size / 2
+        }else{
+            pokemonList.size / 2 + 1 //to account for the extra entry
+        }
+
         items(pokemonList.size) {
+            if(it >= itemCount - 1 && !endReached){//check if we have scrolled to the bottom of page
+                viewModel.loadPokemonPaginated()
+            }
+
             PokemonItem(
                 entry = pokemonList[it],
                 modifier = Modifier.padding(12.dp),
                 viewModel = viewModel
             )
         }
+    }
+
+    Box(
+        contentAlignment = Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if(isLoading) {
+            CircularProgressIndicator(color = MaterialTheme.colors.primary)
+        }
+//        if(loadError.isNotEmpty()) {
+//            RetrySection(error = loadError) {
+//                viewModel.loadPokemonPaginated()
+//            }
+//        }
     }
 }
 
