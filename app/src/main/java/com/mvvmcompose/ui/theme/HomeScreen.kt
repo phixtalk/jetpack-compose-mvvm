@@ -68,7 +68,9 @@ fun HomeScreen(viewModel: PokemonListViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp)
-            )
+            ){
+                viewModel.searchPokemonList(it)
+            }
             Spacer(modifier = Modifier.height(16.dp))
             PokemonList(viewModel)
         }
@@ -104,7 +106,7 @@ fun SearchBar(
                 .background(Color.White, CircleShape)
                 .padding(horizontal = 20.dp, vertical = 12.dp)
                 .onFocusChanged {
-                    isHintDisplayed = !it.isFocused
+                    isHintDisplayed = !it.isFocused && text.isNotEmpty()
                 }
         )
         if(isHintDisplayed){
@@ -126,6 +128,7 @@ fun PokemonList(viewModel: PokemonListViewModel) {
     val endReached by remember { viewModel.endReached }
     val loadError by remember { viewModel.loadError }
     val isLoading by remember { viewModel.isLoading }
+    val isSearching by remember { viewModel.isSearching }
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(2),
@@ -139,7 +142,7 @@ fun PokemonList(viewModel: PokemonListViewModel) {
         }
 
         items(pokemonList.size) {
-            if(it >= itemCount - 1 && !endReached && !isLoading){//check if we have scrolled to the bottom of page
+            if(it >= itemCount - 1 && !endReached && !isLoading && !isSearching){//check if we have scrolled to the bottom of page
                 //so if the current index - it, is >= itemcount - 1 (because list is zero indexed)
                 viewModel.loadPokemonPaginated()
             }
