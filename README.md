@@ -31,4 +31,4 @@ Some of the libraries / patterns used includes:
     - Utils
 
 
-References: Special thanks to Phillip Lackner
+References: Special thanks to Phillip Lackner, Mitch Tabian

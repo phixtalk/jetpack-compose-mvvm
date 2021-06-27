@@ -102,4 +102,12 @@ class PokemonListViewModel (
             }
         }
     }
+
+    fun calcDominantColor(bmp: Bitmap, onFinish: (Color) -> Unit){
+        Palette.from(bmp).generate{ palette ->
+            palette?.dominantSwatch?.rgb?.let { colorValue ->
+                onFinish(Color(colorValue))
+            }
+        }
+    }
 }

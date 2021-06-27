@@ -4,16 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
+import androidx.navigation.compose.rememberNavController
 import com.mvvmcompose.data.remote.ServiceBuilder
+import com.mvvmcompose.pokemondetail.PokemonDetailScreen
 import com.mvvmcompose.pokemonlist.PokemonListViewModel
 import com.mvvmcompose.repository.PokemonRepository
-import com.mvvmcompose.ui.theme.HomeScreen
+import com.mvvmcompose.pokemonlist.PokemonListScreen
 import com.mvvmcompose.ui.theme.MVVMComposeTheme
+import java.util.*
 
 class MainActivity : ComponentActivity() {
     @ExperimentalFoundationApi
@@ -28,7 +32,44 @@ class MainActivity : ComponentActivity() {
             val viewModel = PokemonListViewModel(repository = repository)
 
             MVVMComposeTheme {
-                HomeScreen(viewModel)
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "pokemon_list_screen"
+                ) {
+                    //create first composable screen
+                    composable("pokemon_list_screen"){
+                        PokemonListScreen(
+                            viewModel = viewModel,
+                            navController = navController
+                        )
+                    }
+                    composable(
+                        "pokemon_detail_screen/{dominantColor}/{pokemonName}",
+                        arguments = listOf(
+                            navArgument("dominantColor"){
+                                type = NavType.IntType
+                            },
+                            navArgument("pokemonName"){
+                                type = NavType.StringType
+                            }
+                        )
+                    ){
+                        val dominantColor = remember {
+                            val color = it.arguments?.getInt("dominantColor")
+                            color?.let { Color(it) } ?: Color.White
+                        }
+                        val pokemonName = remember {
+                            it.arguments?.getString("pokemonName")
+                        }
+                        PokemonDetailScreen(
+                            dominantColor = dominantColor,
+                            pokemonName = pokemonName?.lowercase(Locale.ROOT) ?: "",
+                            navController = navController,
+                            //viewModel = viewModel,
+                        )
+                    }
+                }
             }
         }
     }

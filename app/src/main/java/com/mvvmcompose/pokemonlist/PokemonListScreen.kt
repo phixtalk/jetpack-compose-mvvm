@@ -1,7 +1,6 @@
-package com.mvvmcompose.ui.theme
+package com.mvvmcompose.pokemonlist
 
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,10 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -37,19 +37,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import coil.ImageLoader
+import androidx.navigation.NavController
 import coil.request.ImageRequest
-//import com.google.accompanist.coil.CoilImage
+import coil.transform.CircleCropTransformation
 import com.mvvmcompose.R
 import com.mvvmcompose.data.models.PokedexListEntry
-import com.mvvmcompose.pokemonlist.PokemonListViewModel
+import com.mvvmcompose.ui.theme.RobotoCondensed
+//import coil.ImageLoader
+//import com.google.accompanist.coil.CoilImage
 import com.skydoves.landscapist.coil.CoilImage
-import kotlinx.coroutines.NonDisposableHandle.parent
-
+//import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.imageloading.ImageLoadState
+import com.mvvmcompose.util.DEFAULT_RECIPE_IMAGE
+import com.mvvmcompose.util.loadPicture
 
 @ExperimentalFoundationApi
 @Composable
-fun HomeScreen(viewModel: PokemonListViewModel) {
+fun PokemonListScreen(viewModel: PokemonListViewModel, navController: NavController) {
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
@@ -72,7 +76,7 @@ fun HomeScreen(viewModel: PokemonListViewModel) {
                 viewModel.searchPokemonList(it)
             }
             Spacer(modifier = Modifier.height(16.dp))
-            PokemonList(viewModel)
+            PokemonList(viewModel, navController)
         }
     }
 }
@@ -116,13 +120,12 @@ fun SearchBar(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
             )
         }
-
     }
 }
 
 @ExperimentalFoundationApi
 @Composable
-fun PokemonList(viewModel: PokemonListViewModel) {
+fun PokemonList(viewModel: PokemonListViewModel, navController: NavController) {
 
     val pokemonList by remember { viewModel.pokemonList }
     val endReached by remember { viewModel.endReached }
@@ -150,7 +153,8 @@ fun PokemonList(viewModel: PokemonListViewModel) {
             PokemonItem(
                 entry = pokemonList[it],
                 modifier = Modifier.padding(12.dp),
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navController
             )
         }
     }
@@ -175,6 +179,7 @@ fun PokemonItem(
     entry: PokedexListEntry,
     modifier: Modifier = Modifier,
     viewModel: PokemonListViewModel,
+    navController: NavController,
 ) {
     val defaultDominantColor = MaterialTheme.colors.surface
     var dominantColor by remember {
@@ -196,21 +201,48 @@ fun PokemonItem(
                 )
             )
             .clickable {
-//                navController.navigate(
-//                    "pokemon_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
-//                )
+                navController.navigate(
+                    "pokemon_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
+                )
             }
 
     ){
         Column {
+
+            // since the .target property of ImageRequest.Builder property of CoilImage library is not working,
+            // I used Glide library to download the image from url and returned it as bmp
+            // now we can get the dominant color of the image from the bmp using the slightly modified
+            // calcDominantColor method in the viewmodel class
+            val image = loadPicture(url = entry.imageUrl, defaultImage = DEFAULT_RECIPE_IMAGE)
+
+            image?.let { img ->
+
+                //                    Image(
+                //                        painter = rememberCoilPainter(
+                //                            entry.imageUrl,
+                //                            fadeIn = true,
+                //                            requestBuilder = {
+                //                                placeholder(DEFAULT_RECIPE_IMAGE)
+                //                                target()
+                //                            },
+                //                        ),
+                //                        //bitmap = img.asImageBitmap(),
+                //                        contentDescription = entry.pokemonName,
+                //                        modifier = Modifier
+                //                            .size(120.dp)
+                //                            .align(CenterHorizontally)
+                //                    )
+
+                viewModel.calcDominantColor(img){ color ->
+                    dominantColor = color
+                }
+            }
+
+
             CoilImage(
                 imageRequest = ImageRequest.Builder(LocalContext.current)
                     .data(entry.imageUrl)
-                    .target{
-                        viewModel.calcDominantColor(it){ color ->
-                            dominantColor = color
-                        }
-                    }
+                    .target {  }
                     .crossfade(true)
                     .build(),
 
@@ -223,6 +255,7 @@ fun PokemonItem(
                 modifier = Modifier
                     .size(120.dp)
                     .align(CenterHorizontally),
+
                 // shows a progress indicator when loading an image.
                 loading = {
                     ConstraintLayout(
@@ -242,8 +275,8 @@ fun PokemonItem(
                 // shows an error text message when request failed.
                 failure = {
                     Text(text = "image request failed.")
-                })
-
+                },
+            )
 
             Text(
                 text = entry.pokemonName,
