@@ -1,8 +1,8 @@
 package com.mvvmcompose.repository
 
-import com.jetpackcomposepokedex.data.remote.responses.Pokemon
-import com.jetpackcomposepokedex.data.remote.responses.PokemonList
+import com.mvvmcompose.data.remote.responses.Pokemon
 import com.mvvmcompose.data.remote.PokeApi
+import com.mvvmcompose.data.remote.responses.PokemonList
 import com.mvvmcompose.util.Resource
 
 class PokemonRepository (

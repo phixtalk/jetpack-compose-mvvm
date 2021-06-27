@@ -1,7 +1,7 @@
 package com.mvvmcompose.data.remote
 
-import com.jetpackcomposepokedex.data.remote.responses.Pokemon
-import com.jetpackcomposepokedex.data.remote.responses.PokemonList
+import com.mvvmcompose.data.remote.responses.Pokemon
+import com.mvvmcompose.data.remote.responses.PokemonList
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

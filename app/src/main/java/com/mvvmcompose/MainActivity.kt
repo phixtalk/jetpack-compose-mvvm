@@ -13,6 +13,7 @@ import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.mvvmcompose.data.remote.ServiceBuilder
 import com.mvvmcompose.pokemondetail.PokemonDetailScreen
+import com.mvvmcompose.pokemondetail.PokemonDetailViewModel
 import com.mvvmcompose.pokemonlist.PokemonListViewModel
 import com.mvvmcompose.repository.PokemonRepository
 import com.mvvmcompose.pokemonlist.PokemonListScreen
@@ -29,7 +30,9 @@ class MainActivity : ComponentActivity() {
 
             val repository = PokemonRepository(api = api)
 
-            val viewModel = PokemonListViewModel(repository = repository)
+            val viewModelList = PokemonListViewModel(repository = repository)
+
+            val viewModelDetail = PokemonDetailViewModel(repository = repository)
 
             MVVMComposeTheme {
                 val navController = rememberNavController()
@@ -40,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     //create first composable screen
                     composable("pokemon_list_screen"){
                         PokemonListScreen(
-                            viewModel = viewModel,
+                            viewModel = viewModelList,
                             navController = navController
                         )
                     }
@@ -66,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             dominantColor = dominantColor,
                             pokemonName = pokemonName?.lowercase(Locale.ROOT) ?: "",
                             navController = navController,
-                            //viewModel = viewModel,
+                            viewModel = viewModelDetail,
                         )
                     }
                 }

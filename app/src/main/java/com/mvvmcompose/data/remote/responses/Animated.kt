@@ -1,4 +1,4 @@
-package com.jetpackcomposepokedex.data.remote.responses
+package com.mvvmcompose.data.remote.responses
 
 data class Animated(
     val back_default: String,
