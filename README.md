@@ -1,4 +1,4 @@
-## About jetpack-compose-mvvm-clean-arch
+## About jetpack-compose-mvvm-clean-arch -- This is the base working app with no clean architecture or di
 
 This project is a simple 2 page Android Application built using 
 MVVM and Clean Architecture pattern, with android Jetpack Libraries 
