@@ -18,6 +18,11 @@ object ServiceBuilder {
         .addInterceptor(logger)
         .build()
 
+    /*
+    * Using the GsonConverterFactory we can map
+    * the json object response we get from the web api
+    * to a kotlin class
+    * */
     fun providePokeApi(): PokeApi {
         return Retrofit.Builder()
             .client(okkHttpclient)

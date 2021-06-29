@@ -78,7 +78,7 @@ fun PokemonDetailScreen(
                     top = topPadding + pokemonImageSize / 2f,
                     start = 16.dp,
                     end = 16.dp,
-                    bottom = 16.dp
+                    bottom = 0.dp
                 )
                 .shadow(10.dp, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp))
@@ -190,7 +190,7 @@ fun PokemonDetailSection(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .offset(y = 100.dp)
+            .offset(y = 80.dp)
             .verticalScroll(scrollState)
     ) {
         Text(
@@ -313,7 +313,7 @@ fun PokemonStat(
     )
     LaunchedEffect(key1 = true){
         //this does the exact thing as the react-hook useEffect.
-        //it ensures that the code block is run only once after a successful composition
+        //it ensures that the code block is run only once on first composition
         animationPlayed = true
     }
     
