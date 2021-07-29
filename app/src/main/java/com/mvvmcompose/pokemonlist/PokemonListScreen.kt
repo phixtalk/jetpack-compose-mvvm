@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -53,7 +54,10 @@ import com.mvvmcompose.util.loadPicture
 
 @ExperimentalFoundationApi
 @Composable
-fun PokemonListScreen(viewModel: PokemonListViewModel, navController: NavController) {
+fun PokemonListScreen(
+    navController: NavController,
+    viewModel: PokemonListViewModel = hiltViewModel()
+) {
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
@@ -76,7 +80,7 @@ fun PokemonListScreen(viewModel: PokemonListViewModel, navController: NavControl
                 viewModel.searchPokemonList(it)
             }
             Spacer(modifier = Modifier.height(16.dp))
-            PokemonList(viewModel, navController)
+            PokemonList(navController)
         }
     }
 }
@@ -125,7 +129,10 @@ fun SearchBar(
 
 @ExperimentalFoundationApi
 @Composable
-fun PokemonList(viewModel: PokemonListViewModel, navController: NavController) {
+fun PokemonList(
+    navController: NavController,
+    viewModel: PokemonListViewModel = hiltViewModel()
+) {
 
     val pokemonList by remember { viewModel.pokemonList }
     val endReached by remember { viewModel.endReached }
@@ -153,7 +160,6 @@ fun PokemonList(viewModel: PokemonListViewModel, navController: NavController) {
             PokemonItem(
                 entry = pokemonList[it],
                 modifier = Modifier.padding(12.dp),
-                viewModel = viewModel,
                 navController = navController
             )
         }
@@ -178,8 +184,8 @@ fun PokemonList(viewModel: PokemonListViewModel, navController: NavController) {
 fun PokemonItem(
     entry: PokedexListEntry,
     modifier: Modifier = Modifier,
-    viewModel: PokemonListViewModel,
     navController: NavController,
+    viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val defaultDominantColor = MaterialTheme.colors.surface
     var dominantColor by remember {

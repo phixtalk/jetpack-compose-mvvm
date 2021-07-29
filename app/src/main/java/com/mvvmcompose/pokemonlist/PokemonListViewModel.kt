@@ -12,13 +12,16 @@ import com.mvvmcompose.data.models.PokedexListEntry
 import com.mvvmcompose.repository.PokemonRepository
 import com.mvvmcompose.util.Constants.PAGE_SIZE
 import com.mvvmcompose.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 
-class PokemonListViewModel (
+@HiltViewModel
+class PokemonListViewModel @Inject constructor(
     private val repository: PokemonRepository
 ): ViewModel() {
 
