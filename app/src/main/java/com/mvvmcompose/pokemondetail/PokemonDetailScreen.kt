@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.request.ImageRequest
 import com.mvvmcompose.data.remote.responses.Pokemon
@@ -48,7 +49,7 @@ fun PokemonDetailScreen(
     navController: NavController,
     topPadding: Dp = 20.dp,
     pokemonImageSize: Dp = 200.dp,
-    viewModel: PokemonDetailViewModel
+    viewModel: PokemonDetailViewModel = hiltViewModel()
 ) {
     //previously we have been using mutableStateOf to create our state variables and observe them in composables
     //now using produceState, we can make a network call, and get its results as mutablestate as well

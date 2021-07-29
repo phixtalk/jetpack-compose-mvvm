@@ -18,21 +18,23 @@ import com.mvvmcompose.pokemonlist.PokemonListViewModel
 import com.mvvmcompose.repository.PokemonRepository
 import com.mvvmcompose.pokemonlist.PokemonListScreen
 import com.mvvmcompose.ui.theme.MVVMComposeTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
-            val api = ServiceBuilder.providePokeApi()
+            //val api = ServiceBuilder.providePokeApi()
 
-            val repository = PokemonRepository(api = api)
+            //val repository = PokemonRepository(api = api)
 
-            val viewModelList = PokemonListViewModel(repository = repository)
+            //val viewModelList = PokemonListViewModel(repository = repository)
 
-            val viewModelDetail = PokemonDetailViewModel(repository = repository)
+            //val viewModelDetail = PokemonDetailViewModel(repository = repository)
 
             MVVMComposeTheme {
                 val navController = rememberNavController()
@@ -43,7 +45,6 @@ class MainActivity : ComponentActivity() {
                     //create first composable screen
                     composable("pokemon_list_screen"){
                         PokemonListScreen(
-                            viewModel = viewModelList,
                             navController = navController
                         )
                     }
@@ -69,7 +70,6 @@ class MainActivity : ComponentActivity() {
                             dominantColor = dominantColor,
                             pokemonName = pokemonName?.lowercase(Locale.ROOT) ?: "",
                             navController = navController,
-                            viewModel = viewModelDetail,
                         )
                     }
                 }

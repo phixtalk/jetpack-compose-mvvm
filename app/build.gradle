@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -96,15 +98,13 @@ dependencies {
     //Logging
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
 
-    //Dagger - Hilt
-//    implementation "com.google.dagger:hilt-android:2.35"
-
-//    kapt "com.google.dagger:hilt-android-compiler:2.33-beta"
-//    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
-
-//    kapt "androidx.hilt:hilt-compiler:1.0.0"
-
-//    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha02'
+    //Dagger - Hilt //old 2.33-beta
+    def hilt_version = "2.37"
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha03'
 
     implementation 'com.android.support:palette-v7:28.0.0'
 }
